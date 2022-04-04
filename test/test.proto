@@ -5,8 +5,14 @@ option go_package = "errors/test;test";
 import "errors.proto";
 
 enum TestErrorReason {
-    option (errors.default_code) = 500;
+    option (errors.settings) = {
+        default_http_code: 500
+        start_biz_code: 100001
+    };
 
-    TestNotFound = 0 [(errors.code) = {http_code:404 error_no:100001}];
+    TestNotFound = 0 [(errors.code) = {http_code:404}];
+    TestBusy = 1;
+    TestIncrease = 2 [(errors.code) = {http_code:502 biz_code:100010}];
+    TestRedirect = 3 [(errors.code) = {http_code:302}];
 }
 

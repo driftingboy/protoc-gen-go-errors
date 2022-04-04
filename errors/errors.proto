@@ -21,14 +21,21 @@ message Error {
 };
 
 extend google.protobuf.EnumOptions {
-  int32 default_code = 1108;
+  Settings settings = 1108;
 }
 
 extend google.protobuf.EnumValueOptions {
   StatusCode code = 1109;
 }
 
+message Settings {
+  // 如果 EnumValue 没有设置 http code，则使用此数值
+  int32 default_http_code = 1;
+  // 如果 EnumValue 没有设置 biz_code，则按照此数递增
+  int32 start_biz_code = 2;
+}
+
 message StatusCode {
   int32 http_code = 1;
-  int32 error_no = 2;
+  int32 biz_code = 2;
 }

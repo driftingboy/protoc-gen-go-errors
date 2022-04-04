@@ -14,6 +14,9 @@ const _ = errors.SupportPackageIsVersion1
 var bizErrorCodeMap map[string]int = map[string]int{
 
 	"errors.test_TestErrorReason_TestNotFound": 100001,
+	"errors.test_TestErrorReason_TestBusy":     100001,
+	"errors.test_TestErrorReason_TestIncrease": 100010,
+	"errors.test_TestErrorReason_TestRedirect": 100011,
 }
 
 func IsTestnotfound(err error) bool {
@@ -26,6 +29,42 @@ func IsTestnotfound(err error) bool {
 
 func ErrorTestnotfound(format string, args ...interface{}) *errors.Error {
 	return errors.New(404, "errors.test_TestErrorReason_TestNotFound", fmt.Sprintf(format, args...))
+}
+
+func IsTestbusy(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == "errors.test_TestErrorReason_TestBusy" && e.Code == 500
+}
+
+func ErrorTestbusy(format string, args ...interface{}) *errors.Error {
+	return errors.New(500, "errors.test_TestErrorReason_TestBusy", fmt.Sprintf(format, args...))
+}
+
+func IsTestincrease(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == "errors.test_TestErrorReason_TestIncrease" && e.Code == 502
+}
+
+func ErrorTestincrease(format string, args ...interface{}) *errors.Error {
+	return errors.New(502, "errors.test_TestErrorReason_TestIncrease", fmt.Sprintf(format, args...))
+}
+
+func IsTestredirect(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == "errors.test_TestErrorReason_TestRedirect" && e.Code == 302
+}
+
+func ErrorTestredirect(format string, args ...interface{}) *errors.Error {
+	return errors.New(302, "errors.test_TestErrorReason_TestRedirect", fmt.Sprintf(format, args...))
 }
 
 func BizErrorCode(err error) int {

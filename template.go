@@ -25,6 +25,8 @@ func Error{{.CamelValue}}(format string, args ...interface{}) *errors.Error {
 	 return errors.New({{.HTTPCode}}, "{{.Domain}}_{{.Name}}_{{.Value}}", fmt.Sprintf(format, args...))
 }
 
+{{- end }}
+
 func BizErrorCode(err error) int {
 	if err == nil {
 		return 0
@@ -32,8 +34,6 @@ func BizErrorCode(err error) int {
 	e := errors.FromError(err)
 	return bizErrorCodeMap[e.Reason]
 }
-
-{{- end }}
 `
 
 type errorInfo struct {

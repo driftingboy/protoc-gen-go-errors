@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	errorsPackage = protogen.GoImportPath("github.com/driftingboy/protoc-gen-go-errors/errors")
+	errorsPackage = protogen.GoImportPath("github.com/driftingboy/protoc-gen-go-errors/errors") // "github.com/driftingboy/protoc-gen-go-errors/errors"
 	fmtPackage    = protogen.GoImportPath("fmt")
 )
 
@@ -56,31 +56,43 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 
 // return (isSkip bool)
 func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.GeneratedFile, enum *protogen.Enum) bool {
-	defaultCodeI := proto.GetExtension(enum.Desc.Options(), errors.E_DefaultCode)
-	defaultCode, defaultErrorNo := 0, 100001
-	if c, ok := defaultCodeI.(int32); ok {
-		defaultCode = int(c)
+	settingsI := proto.GetExtension(enum.Desc.Options(), errors.E_Settings)
+	defaultHttpCode, startBizCode := 0, 100001
+	if s, ok := settingsI.(*errors.Settings); ok && s != nil {
+		defaultHttpCode, startBizCode = int(s.DefaultHttpCode), int(s.StartBizCode)
 	}
-	if defaultCode > 600 || defaultCode < 0 {
-		panic(fmt.Sprintf("Enum '%s' range must be greater than 0 and less than or equal to 600", string(enum.Desc.Name())))
+	if defaultHttpCode > 600 || defaultHttpCode < 0 {
+		panic(fmt.Sprintf("Enum '%s' httpCode range must in (0,600)", string(enum.Desc.Name())))
 	}
+	if startBizCode > 999999 || startBizCode < 100001 {
+		panic(fmt.Sprintf("Enum '%s' errorNo range must in [100001,999999]", string(enum.Desc.Name())))
+	}
+
 	var ew errorWrapper
+	nextErrorNo := startBizCode
 	for _, v := range enum.Values {
-		httpCode, errorNo := defaultCode, defaultErrorNo
+		httpCode, curErrorNo := defaultHttpCode, startBizCode
 		eCode := proto.GetExtension(v.Desc.Options(), errors.E_Code)
-		if status, ok := eCode.(*errors.StatusCode); ok {
+		if status, ok := eCode.(*errors.StatusCode); ok && status != nil {
 			httpCode = int(status.HttpCode)
-			errorNo = int(status.ErrorNo)
+
+			// 未填写
+			if int(status.BizCode) == 0 {
+				curErrorNo = nextErrorNo
+			} else {
+				curErrorNo = int(status.BizCode)
+			}
+			nextErrorNo = curErrorNo + 1
 		}
 		// If the current enumeration does not contain 'errors.code'
 		// or the code value exceeds the range, the current enum will be skipped
 		if httpCode > 600 || httpCode < 0 {
 			panic(fmt.Sprintf("Enum '%s' httpCode range must in (0,600)", string(v.Desc.Name())))
 		}
-		if errorNo > 999999 || errorNo < 100001 {
+		if curErrorNo > 999999 || curErrorNo < 100001 {
 			panic(fmt.Sprintf("Enum '%s' errorNo range must in [100001,999999]", string(v.Desc.Name())))
 		}
-		if httpCode == 0 || errorNo == 0 {
+		if httpCode == 0 || curErrorNo == 0 {
 			continue
 		}
 
@@ -90,7 +102,7 @@ func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 			Value:        string(v.Desc.Name()),
 			CamelValue:   case2Camel(string(v.Desc.Name())),
 			HTTPCode:     httpCode,
-			BizErrorCode: errorNo,
+			BizErrorCode: curErrorNo,
 			Domain:       domain,
 		}
 		ew.Errors = append(ew.Errors, err)
