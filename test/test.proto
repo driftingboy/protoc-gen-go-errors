@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package errors.test;
+option go_package = "errors/test;test";
+import "errors.proto";
+
+enum TestErrorReason {
+    option (errors.default_code) = 500;
+
+    TestNotFound = 0 [(errors.code) = {http_code:404 error_no:100001}];
+}
+

@@ -5,13 +5,13 @@ import "testing"
 func TestTypes(t *testing.T) {
 	var (
 		input = []error{
-			BadRequest("reason_400", "message_400"),
-			Unauthorized("reason_401", "message_401"),
-			Forbidden("reason_403", "message_403"),
-			NotFound("reason_404", "message_404"),
-			Conflict("reason_409", "message_409"),
-			InternalServer("reason_500", "message_500"),
-			ServiceUnavailable("reason_503", "message_503"),
+			BadRequest("domain", "reason_400"),
+			Unauthorized("domain", "reason_401"),
+			Forbidden("domain", "reason_403"),
+			NotFound("domain", "reason_404"),
+			Conflict("domain", "reason_409"),
+			InternalServer("domain", "reason_500"),
+			ServiceUnavailable("domain", "reason_503"),
 		}
 		output = []func(error) bool{
 			IsBadRequest,

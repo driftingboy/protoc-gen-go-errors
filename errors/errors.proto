@@ -2,18 +2,22 @@ syntax = "proto3";
 
 package errors;
 
-option go_package = "github.com/go-kratos/kratos/v2/errors;errors";
+option go_package = "github.com/driftingboy/protoc-gen-go-errors/errors;errors";
 option java_multiple_files = true;
-option java_package = "com.github.kratos.errors";
-option objc_class_prefix = "KratosErrors";
+option java_package = "com.github.driftingboy.errors";
+option objc_class_prefix = "DriftingboyErrors";
 
 import "google/protobuf/descriptor.proto";
 
 message Error {
+  // code is http code.
   int32 code = 1;
-  string reason = 2;
-  string message = 3;
-  map<string, string> metadata = 4;
+  // error reason, It consists of domain, model and error-info
+  string reason = 3;
+  // describe error.
+  string message = 4;
+  // more info.
+  map<string, string> metadata = 5;
 };
 
 extend google.protobuf.EnumOptions {
@@ -21,5 +25,10 @@ extend google.protobuf.EnumOptions {
 }
 
 extend google.protobuf.EnumValueOptions {
-  int32 code = 1109;
+  StatusCode code = 1109;
+}
+
+message StatusCode {
+  int32 http_code = 1;
+  int32 error_no = 2;
 }

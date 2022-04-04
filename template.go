@@ -6,6 +6,11 @@ import (
 )
 
 var errorsTemplate = `
+var bizErrorCodeMap map[string]int = map[string]int{
+	{{ range .Errors }}
+		"{{.Domain}}_{{.Name}}_{{.Value}}":{{.BizErrorCode}},
+	{{- end }}
+}
 {{ range .Errors }}
 
 func Is{{.CamelValue}}(err error) bool {
@@ -13,28 +18,38 @@ func Is{{.CamelValue}}(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == {{.Name}}_{{.Value}}.String() && e.Code == {{.HTTPCode}} 
+	return e.Reason == "{{.Domain}}_{{.Name}}_{{.Value}}" && e.Code == {{.HTTPCode}}
 }
 
 func Error{{.CamelValue}}(format string, args ...interface{}) *errors.Error {
-	 return errors.New({{.HTTPCode}}, {{.Name}}_{{.Value}}.String(), fmt.Sprintf(format, args...))
+	 return errors.New({{.HTTPCode}}, "{{.Domain}}_{{.Name}}_{{.Value}}", fmt.Sprintf(format, args...))
+}
+
+func BizErrorCode(err error) int {
+	if err == nil {
+		return 0
+	}
+	e := errors.FromError(err)
+	return bizErrorCodeMap[e.Reason]
 }
 
 {{- end }}
 `
 
 type errorInfo struct {
-	Name       string
-	Value      string
-	HTTPCode   int
-	CamelValue string
+	Name         string
+	Value        string
+	HTTPCode     int
+	BizErrorCode int
+	Domain       string
+	CamelValue   string
 }
 
 type errorWrapper struct {
 	Errors []*errorInfo
 }
 
-func (e *errorWrapper) execute() string {
+func (e *errorWrapper) generateTemp() string {
 	buf := new(bytes.Buffer)
 	tmpl, err := template.New("errors").Parse(errorsTemplate)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"errors/errors"
+	"github.com/driftingboy/protoc-gen-go-errors/errors"
 
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
@@ -54,42 +54,51 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 	}
 }
 
+// return (isSkip bool)
 func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.GeneratedFile, enum *protogen.Enum) bool {
-	defaultCode := proto.GetExtension(enum.Desc.Options(), errors.E_DefaultCode)
-	code := 0
-	if ok := defaultCode.(int32); ok != 0 {
-		code = int(ok)
+	defaultCodeI := proto.GetExtension(enum.Desc.Options(), errors.E_DefaultCode)
+	defaultCode, defaultErrorNo := 0, 100001
+	if c, ok := defaultCodeI.(int32); ok {
+		defaultCode = int(c)
 	}
-	if code > 600 || code < 0 {
+	if defaultCode > 600 || defaultCode < 0 {
 		panic(fmt.Sprintf("Enum '%s' range must be greater than 0 and less than or equal to 600", string(enum.Desc.Name())))
 	}
 	var ew errorWrapper
 	for _, v := range enum.Values {
-		enumCode := code
+		httpCode, errorNo := defaultCode, defaultErrorNo
 		eCode := proto.GetExtension(v.Desc.Options(), errors.E_Code)
-		if ok := eCode.(int32); ok != 0 {
-			enumCode = int(ok)
+		if status, ok := eCode.(*errors.StatusCode); ok {
+			httpCode = int(status.HttpCode)
+			errorNo = int(status.ErrorNo)
 		}
 		// If the current enumeration does not contain 'errors.code'
 		// or the code value exceeds the range, the current enum will be skipped
-		if enumCode > 600 || enumCode < 0 {
-			panic(fmt.Sprintf("Enum '%s' range must be greater than 0 and less than or equal to 600", string(v.Desc.Name())))
+		if httpCode > 600 || httpCode < 0 {
+			panic(fmt.Sprintf("Enum '%s' httpCode range must in (0,600)", string(v.Desc.Name())))
 		}
-		if enumCode == 0 {
+		if errorNo > 999999 || errorNo < 100001 {
+			panic(fmt.Sprintf("Enum '%s' errorNo range must in [100001,999999]", string(v.Desc.Name())))
+		}
+		if httpCode == 0 || errorNo == 0 {
 			continue
 		}
+
+		domain := string(file.Desc.Package())
 		err := &errorInfo{
-			Name:       string(enum.Desc.Name()),
-			Value:      string(v.Desc.Name()),
-			CamelValue: case2Camel(string(v.Desc.Name())),
-			HTTPCode:   enumCode,
+			Name:         string(enum.Desc.Name()),
+			Value:        string(v.Desc.Name()),
+			CamelValue:   case2Camel(string(v.Desc.Name())),
+			HTTPCode:     httpCode,
+			BizErrorCode: errorNo,
+			Domain:       domain,
 		}
 		ew.Errors = append(ew.Errors, err)
 	}
 	if len(ew.Errors) == 0 {
 		return true
 	}
-	g.P(ew.execute())
+	g.P(ew.generateTemp())
 	return false
 }
 

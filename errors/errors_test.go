@@ -13,8 +13,8 @@ import (
 
 func TestError(t *testing.T) {
 	var base *Error
-	err := Newf(http.StatusBadRequest, "reason", "message")
-	err2 := Newf(http.StatusBadRequest, "reason", "message")
+	err := Newf(http.StatusBadRequest, "iam", "reason", "message")
+	err2 := Newf(http.StatusBadRequest, "iam", "reason", "message")
 	err3 := err.WithMetadata(map[string]string{
 		"foo": "bar",
 	})

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	httpstatus "status/status"
+	httpstatus "github.com/driftingboy/protoc-gen-go-errors/errors/status"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/status"
