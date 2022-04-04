@@ -14,7 +14,7 @@ const _ = errors.SupportPackageIsVersion1
 var bizErrorCodeMap map[string]int = map[string]int{
 
 	"errors.test_TestErrorReason_TestNotFound": 100001,
-	"errors.test_TestErrorReason_TestBusy":     100001,
+	"errors.test_TestErrorReason_TestBusy":     100002,
 	"errors.test_TestErrorReason_TestIncrease": 100010,
 	"errors.test_TestErrorReason_TestRedirect": 100011,
 }

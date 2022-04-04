@@ -71,19 +71,17 @@ func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 	var ew errorWrapper
 	nextErrorNo := startBizCode
 	for _, v := range enum.Values {
-		httpCode, curErrorNo := defaultHttpCode, startBizCode
+		httpCode, curErrorNo := defaultHttpCode, 0
 		eCode := proto.GetExtension(v.Desc.Options(), errors.E_Code)
 		if status, ok := eCode.(*errors.StatusCode); ok && status != nil {
 			httpCode = int(status.HttpCode)
-
-			// 未填写
-			if int(status.BizCode) == 0 {
-				curErrorNo = nextErrorNo
-			} else {
-				curErrorNo = int(status.BizCode)
-			}
-			nextErrorNo = curErrorNo + 1
+			curErrorNo = int(status.BizCode)
 		}
+		// 未填写
+		if curErrorNo == 0 {
+			curErrorNo = nextErrorNo
+		}
+		nextErrorNo = curErrorNo + 1
 		// If the current enumeration does not contain 'errors.code'
 		// or the code value exceeds the range, the current enum will be skipped
 		if httpCode > 600 || httpCode < 0 {
