@@ -94,14 +94,13 @@ func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 			continue
 		}
 
-		domain := string(file.Desc.Package())
+		// packageName := string(file.Desc.Package())
 		err := &errorInfo{
 			Name:         string(enum.Desc.Name()),
 			Value:        string(v.Desc.Name()),
 			CamelValue:   case2Camel(string(v.Desc.Name())),
 			HTTPCode:     httpCode,
 			BizErrorCode: curErrorNo,
-			Domain:       domain,
 		}
 		ew.Errors = append(ew.Errors, err)
 	}
@@ -114,9 +113,9 @@ func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 
 func case2Camel(name string) string {
 	if !strings.Contains(name, "_") {
-		return strings.Title(strings.ToLower(name))
+		return name
 	}
-	name = strings.ToLower(name)
+	// name = strings.ToLower(name)
 	name = strings.Replace(name, "_", " ", -1)
 	name = strings.Title(name)
 	return strings.Replace(name, " ", "", -1)

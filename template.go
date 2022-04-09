@@ -8,7 +8,7 @@ import (
 var errorsTemplate = `
 var bizErrorCodeMap map[string]int = map[string]int{
 	{{ range .Errors }}
-		"{{.Domain}}_{{.Name}}_{{.Value}}":{{.BizErrorCode}},
+		"{{.Name}}_{{.Value}}":{{.BizErrorCode}},
 	{{- end }}
 }
 {{ range .Errors }}
@@ -18,11 +18,11 @@ func Is{{.CamelValue}}(err error) bool {
 		return false
 	}
 	e := errors.FromError(err)
-	return e.Reason == "{{.Domain}}_{{.Name}}_{{.Value}}" && e.Code == {{.HTTPCode}}
+	return e.Reason == "{{.Name}}_{{.Value}}" && e.Code == {{.HTTPCode}}
 }
 
 func Error{{.CamelValue}}(format string, args ...interface{}) *errors.Error {
-	 return errors.New({{.HTTPCode}}, "{{.Domain}}_{{.Name}}_{{.Value}}", fmt.Sprintf(format, args...))
+	 return errors.New({{.HTTPCode}}, "{{.Name}}_{{.Value}}", fmt.Sprintf(format, args...))
 }
 
 {{- end }}
@@ -41,7 +41,6 @@ type errorInfo struct {
 	Value        string
 	HTTPCode     int
 	BizErrorCode int
-	Domain       string
 	CamelValue   string
 }
 
