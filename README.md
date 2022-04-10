@@ -57,13 +57,14 @@ func BizErrorCode(err error) int {
 
 1. build the binary util
 ```shell
-go build -o protoc-gen-go-xerrors *.go
+# 下载依赖
+make init
 
-mv protoc-gen-go-xerrors ~/go/bin/
+# 安装可执行文件
+make build
 ```
 2. use it
 
 ```shell
-cd ./test
 make test
 ```
