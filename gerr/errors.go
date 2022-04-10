@@ -1,10 +1,10 @@
-package errors
+package gerr
 
 import (
 	"errors"
 	"fmt"
 
-	httpstatus "github.com/driftingboy/protoc-gen-go-errors/errors/status"
+	httpstatus "github.com/driftingboy/protoc-gen-go-errors/gerr/status"
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/status"

@@ -17,12 +17,12 @@ func Is{{.CamelValue}}(err error) bool {
 	if err == nil {
 		return false
 	}
-	e := errors.FromError(err)
+	e := gerr.FromError(err)
 	return e.Reason == "{{.Name}}_{{.Value}}" && e.Code == {{.HTTPCode}}
 }
 
-func Error{{.CamelValue}}(format string, args ...interface{}) *errors.Error {
-	 return errors.New({{.HTTPCode}}, "{{.Name}}_{{.Value}}", fmt.Sprintf(format, args...))
+func Error{{.CamelValue}}(format string, args ...interface{}) *gerr.Error {
+	 return gerr.New({{.HTTPCode}}, "{{.Name}}_{{.Value}}", fmt.Sprintf(format, args...))
 }
 
 {{- end }}
@@ -31,7 +31,7 @@ func BizErrorCode(err error) int {
 	if err == nil {
 		return 0
 	}
-	e := errors.FromError(err)
+	e := gerr.FromError(err)
 	return bizErrorCodeMap[e.Reason]
 }
 `

@@ -4,73 +4,73 @@ package test
 
 import (
 	fmt "fmt"
-	errors "github.com/driftingboy/protoc-gen-go-errors/errors"
+	gerr "github.com/driftingboy/protoc-gen-go-errors/gerr"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the kratos package it is being compiled against.
-const _ = errors.SupportPackageIsVersion1
+const _ = gerr.SupportPackageIsVersion1
 
 var bizErrorCodeMap map[string]int = map[string]int{
 
-	"errors.test_TestErrorReason_TestNotFound": 100001,
-	"errors.test_TestErrorReason_TestBusy":     100002,
-	"errors.test_TestErrorReason_TestIncrease": 100010,
-	"errors.test_TestErrorReason_TestRedirect": 100011,
+	"TestErrorReason_TestNotFound": 100001,
+	"TestErrorReason_TestBusy":     100002,
+	"TestErrorReason_TestIncrease": 100010,
+	"TestErrorReason_TestRedirect": 100011,
 }
 
-func IsTestnotfound(err error) bool {
+func IsTestNotFound(err error) bool {
 	if err == nil {
 		return false
 	}
-	e := errors.FromError(err)
-	return e.Reason == "errors.test_TestErrorReason_TestNotFound" && e.Code == 404
+	e := gerr.FromError(err)
+	return e.Reason == "TestErrorReason_TestNotFound" && e.Code == 404
 }
 
-func ErrorTestnotfound(format string, args ...interface{}) *errors.Error {
-	return errors.New(404, "errors.test_TestErrorReason_TestNotFound", fmt.Sprintf(format, args...))
+func ErrorTestNotFound(format string, args ...interface{}) *gerr.Error {
+	return gerr.New(404, "TestErrorReason_TestNotFound", fmt.Sprintf(format, args...))
 }
 
-func IsTestbusy(err error) bool {
+func IsTestBusy(err error) bool {
 	if err == nil {
 		return false
 	}
-	e := errors.FromError(err)
-	return e.Reason == "errors.test_TestErrorReason_TestBusy" && e.Code == 500
+	e := gerr.FromError(err)
+	return e.Reason == "TestErrorReason_TestBusy" && e.Code == 500
 }
 
-func ErrorTestbusy(format string, args ...interface{}) *errors.Error {
-	return errors.New(500, "errors.test_TestErrorReason_TestBusy", fmt.Sprintf(format, args...))
+func ErrorTestBusy(format string, args ...interface{}) *gerr.Error {
+	return gerr.New(500, "TestErrorReason_TestBusy", fmt.Sprintf(format, args...))
 }
 
-func IsTestincrease(err error) bool {
+func IsTestIncrease(err error) bool {
 	if err == nil {
 		return false
 	}
-	e := errors.FromError(err)
-	return e.Reason == "errors.test_TestErrorReason_TestIncrease" && e.Code == 502
+	e := gerr.FromError(err)
+	return e.Reason == "TestErrorReason_TestIncrease" && e.Code == 502
 }
 
-func ErrorTestincrease(format string, args ...interface{}) *errors.Error {
-	return errors.New(502, "errors.test_TestErrorReason_TestIncrease", fmt.Sprintf(format, args...))
+func ErrorTestIncrease(format string, args ...interface{}) *gerr.Error {
+	return gerr.New(502, "TestErrorReason_TestIncrease", fmt.Sprintf(format, args...))
 }
 
-func IsTestredirect(err error) bool {
+func IsTestRedirect(err error) bool {
 	if err == nil {
 		return false
 	}
-	e := errors.FromError(err)
-	return e.Reason == "errors.test_TestErrorReason_TestRedirect" && e.Code == 302
+	e := gerr.FromError(err)
+	return e.Reason == "TestErrorReason_TestRedirect" && e.Code == 302
 }
 
-func ErrorTestredirect(format string, args ...interface{}) *errors.Error {
-	return errors.New(302, "errors.test_TestErrorReason_TestRedirect", fmt.Sprintf(format, args...))
+func ErrorTestRedirect(format string, args ...interface{}) *gerr.Error {
+	return gerr.New(302, "TestErrorReason_TestRedirect", fmt.Sprintf(format, args...))
 }
 
 func BizErrorCode(err error) int {
 	if err == nil {
 		return 0
 	}
-	e := errors.FromError(err)
+	e := gerr.FromError(err)
 	return bizErrorCodeMap[e.Reason]
 }

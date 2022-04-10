@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/driftingboy/protoc-gen-go-errors/errors"
-
+	"github.com/driftingboy/protoc-gen-go-errors/gerr"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 )
 
 const (
-	errorsPackage = protogen.GoImportPath("github.com/driftingboy/protoc-gen-go-errors/errors") // "github.com/driftingboy/protoc-gen-go-errors/errors"
+	errorsPackage = protogen.GoImportPath("github.com/driftingboy/protoc-gen-go-errors/gerr") // "github.com/driftingboy/protoc-gen-go-errors/errors"
 	fmtPackage    = protogen.GoImportPath("fmt")
 )
 
@@ -56,9 +55,9 @@ func generateFileContent(gen *protogen.Plugin, file *protogen.File, g *protogen.
 
 // return (isSkip bool)
 func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.GeneratedFile, enum *protogen.Enum) bool {
-	settingsI := proto.GetExtension(enum.Desc.Options(), errors.E_Settings)
+	settingsI := proto.GetExtension(enum.Desc.Options(), gerr.E_Settings)
 	defaultHttpCode, startBizCode := 0, 100001
-	if s, ok := settingsI.(*errors.Settings); ok && s != nil {
+	if s, ok := settingsI.(*gerr.Settings); ok && s != nil {
 		defaultHttpCode, startBizCode = int(s.DefaultHttpCode), int(s.StartBizCode)
 	}
 	if defaultHttpCode > 600 || defaultHttpCode < 0 {
@@ -72,8 +71,8 @@ func genErrorsReason(gen *protogen.Plugin, file *protogen.File, g *protogen.Gene
 	nextErrorNo := startBizCode
 	for _, v := range enum.Values {
 		httpCode, curErrorNo := defaultHttpCode, 0
-		eCode := proto.GetExtension(v.Desc.Options(), errors.E_Code)
-		if status, ok := eCode.(*errors.StatusCode); ok && status != nil {
+		eCode := proto.GetExtension(v.Desc.Options(), gerr.E_Code)
+		if status, ok := eCode.(*gerr.StatusCode); ok && status != nil {
 			httpCode = int(status.HttpCode)
 			curErrorNo = int(status.BizCode)
 		}

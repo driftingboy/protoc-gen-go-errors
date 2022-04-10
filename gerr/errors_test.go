@@ -1,4 +1,4 @@
-package errors
+package gerr
 
 import (
 	"errors"
@@ -11,10 +11,10 @@ import (
 	"google.golang.org/grpc/test/grpc_testing"
 )
 
-func TestError(t *testing.T) {
+func TestError(t *testing.T) { // 52-401
 	var base *Error
-	err := Newf(http.StatusBadRequest, "iam", "reason", "message")
-	err2 := Newf(http.StatusBadRequest, "iam", "reason", "message")
+	err := New(http.StatusBadRequest, "reason", "message")
+	err2 := New(http.StatusBadRequest, "reason", "message")
 	err3 := err.WithMetadata(map[string]string{
 		"foo": "bar",
 	})
